@@ -49,7 +49,7 @@ export default class NetServerFunction<C extends Array<any> = Array<unknown>> {
 	/**
 	 * The callback function
 	 */
-	public GetCallback(): Callback {
+	public GetCallback(): ((player: Player, ...args: Array<unknown>) => void) | undefined {
 		return this.instance.OnServerInvoke;
 	}
 
