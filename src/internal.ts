@@ -10,7 +10,7 @@ export interface RequestCounter {
 export const IS_SERVER = !runService.IsRunning() || runService.IsServer();
 
 /** @internal */
-export const IS_CLIENT = !runService.IsRunning() || runService.IsClient();
+export const IS_CLIENT = runService.IsRunning() && runService.IsClient();
 
 /** @internal */
 export const MAX_CLIENT_WAITFORCHILD_TIMEOUT = 10;
