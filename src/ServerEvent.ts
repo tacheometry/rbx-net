@@ -257,6 +257,13 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 			clientValue.Name = "RateLimit";
 			clientValue.Value = requestsPerMinute;
 		}
+
+		return this;
+	}
+
+	public SetTypes<TT extends Array<any> = Array<unknown>>(...args: TT): NetServerEvent<TT> {
+		this.propTypes = args;
+		return this as NetServerEvent<TT, []>;
 	}
 
 	public GetRateLimit() {

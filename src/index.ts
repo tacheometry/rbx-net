@@ -6,8 +6,6 @@ import NetServerEvent from "./ServerEvent";
 import NetClientEvent from "./ClientEvent";
 import NetClientFunction from "./ClientFunction";
 import NetServerFunction from "./ServerFunction";
-import NetServerThrottledFunction from "./ServerThrottledFunction";
-import NetServerThrottledEvent from "./ServerThrottledEvent";
 import NetGlobalEvent from "./GlobalEvent";
 import NetGlobalServerEvent from "./GlobalServerEvent";
 import NetServerAsyncFunction from "./ServerAsyncFunction";
@@ -86,16 +84,6 @@ namespace Net {
 	export const GlobalServerEvent = NetGlobalServerEvent;
 	export type GlobalServerEvent = NetGlobalServerEvent;
 
-	/** @deprecated */
-	export const ServerThrottledEvent = NetServerThrottledEvent;
-	/** @deprecated */
-	export type ServerThrottledEvent = NetServerEvent;
-
-	/** @deprecated */
-	export const ServerThrottledFunction = NetServerThrottledFunction;
-	/** @deprecated */
-	export type ServerThrottledFunction = NetServerFunction;
-
 	export function IsClient() {
 		return IS_CLIENT;
 	}
@@ -118,10 +106,7 @@ namespace Net {
 			if (typeIs(nameOrOptions, "string")) {
 				return new NetServerFunction(nameOrOptions);
 			} else {
-				const fn =
-					nameOrOptions.rateLimit !== undefined
-						? new NetServerThrottledFunction(nameOrOptions.name, nameOrOptions.rateLimit)
-						: new NetServerFunction(nameOrOptions.name);
+				const fn = new NetServerFunction(nameOrOptions.name);
 
 				if (nameOrOptions.callback) {
 					fn.SetCallback(nameOrOptions.callback);
@@ -133,34 +118,6 @@ namespace Net {
 
 				return fn;
 			}
-		} else {
-			throw "Net.createFunction can only be used on the server!";
-		}
-	}
-
-	/**
-	 * Creates a function that has a limited number of client requests every timeout (default 60 seconds)
-	 * @param name The name of the function
-	 * @param rateLimit The amount of requests allowed by clients in the rate timeout (default 60 seconds)
-	 * @rbxts server
-	 */
-	export function CreateThrottledFunction(name: string, rateLimit: number): NetServerFunction {
-		if (IS_SERVER) {
-			return new NetServerThrottledFunction(name, rateLimit);
-		} else {
-			throw "Net.createFunction can only be used on the server!";
-		}
-	}
-
-	/**
-	 * Creates an event that has a limited number of client requests every timeout (default 60 seconds)
-	 * @param name The name of the event
-	 * @param rateLimit The amount of requests allowed by clients in the rate timeout (default 60 seconds)
-	 * @rbxts server
-	 */
-	export function CreateThrottledEvent(name: string, rateLimit: number): NetServerEvent {
-		if (IS_SERVER) {
-			return new NetServerThrottledEvent(name, rateLimit);
 		} else {
 			throw "Net.createFunction can only be used on the server!";
 		}
