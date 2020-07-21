@@ -7,6 +7,7 @@ import {
 	TypeGuards,
 	RequestCounter,
 	errorft,
+	IS_RUNNING,
 } from "./internal";
 import throttler from "./Throttle";
 import { GetConfiguration } from "./configuration";
@@ -167,6 +168,8 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 	 * @param args The arguments to send to the players
 	 */
 	public SendToAllPlayers(...args: StaticArguments<F>) {
+		if (!IS_RUNNING) return;
+
 		if (this.callTypes !== undefined) {
 			if (!checkArguments(this.callTypes, args)) {
 				return;
@@ -182,6 +185,8 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 	 * @param args The arguments
 	 */
 	public SendToAllPlayersExcept(blacklist: Player | Array<Player>, ...args: StaticArguments<F>) {
+		if (!IS_RUNNING) return;
+
 		if (this.callTypes !== undefined) {
 			if (!checkArguments(this.callTypes, args)) {
 				return;
@@ -208,6 +213,8 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 	 * @param args The arguments to send to the player
 	 */
 	public SendToPlayer(player: Player, ...args: StaticArguments<F>) {
+		if (!IS_RUNNING) return;
+
 		if (this.callTypes !== undefined) {
 			if (!checkArguments(this.callTypes, args)) {
 				return;
@@ -223,6 +230,8 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 	 * @param args The arugments to send to these players
 	 */
 	public SendToPlayers(players: Array<Player>, ...args: StaticArguments<F>) {
+		if (!IS_RUNNING) return;
+
 		if (this.callTypes !== undefined) {
 			if (!checkArguments(this.callTypes, args)) {
 				return;
