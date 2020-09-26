@@ -1,7 +1,7 @@
-import { findOrCreateRemote, IS_CLIENT } from "./internal";
+import { findOrCreateRemote, IS_CLIENT, NetManagedEvent } from "./internal";
 import { ArgumentMiddleware } from "./Middleware/Middleware";
 
-class ServerEventV2<CallArguments extends Array<unknown> = Array<unknown>> {
+class ServerEventV2<CallArguments extends Array<unknown> = Array<unknown>> implements NetManagedEvent {
 	private instance: RemoteEvent;
 	public constructor(
 		private readonly name: string,
@@ -11,6 +11,10 @@ class ServerEventV2<CallArguments extends Array<unknown> = Array<unknown>> {
 		assert(!IS_CLIENT, "Cannot create a NetServerEvent on the client!");
 	}
 
+	public GetInstance() {
+		return this.instance;
+	}
+
 	/**
 	 * Connect
 	 */
@@ -18,28 +22,35 @@ class ServerEventV2<CallArguments extends Array<unknown> = Array<unknown>> {
 		const { middlewares } = this;
 
 		const connection = this.instance.OnServerEvent.Connect((player, ...args) => {
-			if (middlewares) {
-				for (const middleware of middlewares) {
-					const argResult = middleware(args);
-					if (argResult) {
-						args = argResult;
-					} else {
-						return;
+			try {
+				if (middlewares) {
+					for (const middleware of middlewares) {
+						args = middleware(args, player, this);
 					}
-				}
-			}
 
-			callback(player, ...(args as CallArguments));
+					callback(player, ...(args as CallArguments));
+				}
+			} catch (e) {
+				warn("[rbx-net] " + tostring(e));
+			}
 		});
 
 		return connection;
 	}
 }
 
-type EnhancedServerEventV2<M0 = defined, M1 = defined, M2 = defined, M3 = defined> = M3 extends ArgumentMiddleware<
-	infer A,
-	infer _
->
+type EnhancedServerEventV2<
+	M0 = defined,
+	M1 = defined,
+	M2 = defined,
+	M3 = defined,
+	M4 = defined,
+	M5 = defined
+> = M5 extends ArgumentMiddleware<infer A, infer _>
+	? ServerEventV2<A>
+	: M4 extends ArgumentMiddleware<infer A, infer _>
+	? ServerEventV2<A>
+	: M3 extends ArgumentMiddleware<infer A, infer _>
 	? ServerEventV2<A>
 	: M2 extends ArgumentMiddleware<infer A, infer _>
 	? ServerEventV2<A>
@@ -86,6 +97,36 @@ export interface ServerEventV2Constructor {
 		name: string,
 		middlewares: [M0, M1, M2],
 	): EnhancedServerEventV2<M0, M1, M2>;
+	new <
+		M0 extends ArgumentMiddleware<any>,
+		M1 extends ArgumentMiddleware<any, InferPrevType<M0>>,
+		M2 extends ArgumentMiddleware<any, InferPrevType<M1>>,
+		M3 extends ArgumentMiddleware<any, InferPrevType<M2>>
+	>(
+		name: string,
+		middlewares: [M0, M1, M2, M3],
+	): EnhancedServerEventV2<M0, M1, M2, M3>;
+	new <
+		M0 extends ArgumentMiddleware<any>,
+		M1 extends ArgumentMiddleware<any, InferPrevType<M0>>,
+		M2 extends ArgumentMiddleware<any, InferPrevType<M1>>,
+		M3 extends ArgumentMiddleware<any, InferPrevType<M2>>,
+		M4 extends ArgumentMiddleware<any, InferPrevType<M3>>
+	>(
+		name: string,
+		middlewares: [M0, M1, M2, M3, M4],
+	): EnhancedServerEventV2<M0, M1, M2, M3, M4>;
+	new <
+		M0 extends ArgumentMiddleware<any>,
+		M1 extends ArgumentMiddleware<any, InferPrevType<M0>>,
+		M2 extends ArgumentMiddleware<any, InferPrevType<M1>>,
+		M3 extends ArgumentMiddleware<any, InferPrevType<M2>>,
+		M4 extends ArgumentMiddleware<any, InferPrevType<M3>>,
+		M5 extends ArgumentMiddleware<any, InferPrevType<M4>>
+	>(
+		name: string,
+		middlewares: [M0, M1, M2, M3, M4, M5],
+	): EnhancedServerEventV2<M0, M1, M2, M3, M4, M5>;
 }
 
 type NetServerEventV2 = ServerEventV2;

@@ -11,6 +11,8 @@ import NetGlobalServerEvent from "./GlobalServerEvent";
 import NetServerAsyncFunction from "./ServerAsyncFunction";
 import NetClientAsyncFunction from "./ClientAsyncFunction";
 import NetServerEventV2 from "./ServerEventV2";
+import createRateLimiter from "./Middleware/RateLimitMiddleware";
+import createTypeChecker from "./Middleware/TypeCheckMiddleware";
 
 const runService = game.GetService("RunService");
 
@@ -207,18 +209,6 @@ namespace Net {
 	}
 
 	/** @rbxts server */
-	export function GetServerEventAsync(name: string): Promise<NetServerEvent> {
-		return new Promise((resolve, reject) => {
-			if (eventExists(name)) {
-				const newFunc = new ServerEvent(name);
-				resolve(newFunc);
-			} else {
-				reject("Could not find Server Event: " + name + " (did you create it on the server?)");
-			}
-		});
-	}
-
-	/** @rbxts server */
 	export function GetServerFunctionAsync(name: string): Promise<NetServerFunction> {
 		return new Promise((resolve, reject) => {
 			if (functionExists(name)) {
@@ -261,6 +251,9 @@ namespace Net {
 	export function Types<T extends Array<TypeGuard<any>>>(...value: T): TypeGuards<T> {
 		return (value as Array<TypeGuard<any>>) as TypeGuards<T>;
 	}
+
+	export const RateLimited = createRateLimiter;
+	export const Typed = createTypeChecker;
 }
 
 export = Net;

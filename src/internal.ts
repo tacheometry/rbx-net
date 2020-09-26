@@ -27,6 +27,10 @@ export function isLuaTable(value: unknown): value is Map<unknown, unknown> {
 	return typeIs(value, "table");
 }
 
+export interface NetManagedEvent {
+	GetInstance(): RemoteEvent;
+}
+
 const REMOTES_FOLDER_NAME = "Remotes";
 const FUNCTIONS_FOLDER_NAME = "Functions";
 const EVENTS_FOLDER_NAME = "Events";
@@ -57,7 +61,7 @@ const asyncFunctionFolder = findOrCreateFolder(remoteFolder, ASYNC_FUNCTIONS_FOL
  * @param message The message
  * @param vars variables to pass to the error message
  */
-export function errorft(message: string, vars: { [name: string]: unknown }) {
+export function errorft(message: string, vars: { [name: string]: unknown }): never {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	[message] = message.gsub("{([%w_][%w%d_]*)}", (token: string) => {
