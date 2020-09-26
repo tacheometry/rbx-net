@@ -261,11 +261,6 @@ export default class NetServerEvent<C extends Array<any> = Array<unknown>, F ext
 		return this;
 	}
 
-	public SetTypes<TT extends Array<any> = Array<unknown>>(...args: TT): NetServerEvent<TT> {
-		this.propTypes = args;
-		return this as NetServerEvent<TT, []>;
-	}
-
 	public GetRateLimit() {
 		return this.maxRequestsPerMinute;
 	}

@@ -10,6 +10,7 @@ import NetGlobalEvent from "./GlobalEvent";
 import NetGlobalServerEvent from "./GlobalServerEvent";
 import NetServerAsyncFunction from "./ServerAsyncFunction";
 import NetClientAsyncFunction from "./ClientAsyncFunction";
+import NetServerEventV2 from "./ServerEventV2";
 
 const runService = game.GetService("RunService");
 
@@ -60,8 +61,19 @@ namespace Net {
 		},
 	});
 
-	export const ServerEvent = NetServerEvent;
-	export type ServerEvent = NetServerEvent;
+	/**
+	 * The old ServerEvent
+	 * @version 1
+	 */
+	export const LegacyServerEvent = NetServerEvent;
+	export type LegacyServerEvent = NetServerEvent;
+
+	/**
+	 * Server Event
+	 * @version 2
+	 */
+	export const ServerEvent = NetServerEventV2;
+	export type ServerEvent = NetServerEventV2;
 
 	export const ClientEvent = NetClientEvent;
 	export type ClientEvent = NetClientEvent;
