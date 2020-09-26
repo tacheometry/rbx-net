@@ -4,10 +4,7 @@ type CheckLike<T> = (value: unknown) => value is T;
 type InferValue<T> = T extends CheckLike<infer A> ? A : never;
 type Convert<T> = { [K in keyof T]: InferValue<T[K]> };
 
-interface TypeCheckMiddleware<T extends Array<unknown>> extends ArgumentMiddleware<Convert<T>> {
-	// TODO:
-	readonly dud?: never;
-}
+type TypeCheckMiddleware<T extends Array<unknown>> = ArgumentMiddleware<Convert<T>>;
 
 /**
  * Type checking middleware for Net
