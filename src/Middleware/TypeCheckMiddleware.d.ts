@@ -1,10 +1,10 @@
-import { ArgumentMiddleware } from "./Middleware";
+import { LegacyMiddleware, Middleware } from "./Middleware";
 
 type CheckLike<T> = (value: unknown) => value is T;
 type InferValue<T> = T extends CheckLike<infer A> ? A : never;
 type Convert<T> = { [K in keyof T]: InferValue<T[K]> };
 
-type TypeCheckMiddleware<T extends Array<unknown>> = ArgumentMiddleware<Convert<T>>;
+type TypeCheckMiddleware<T extends Array<unknown>> = Middleware<Convert<T>>;
 
 /**
  * Type checking middleware for Net

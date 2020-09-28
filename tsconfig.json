@@ -28,5 +28,8 @@
 			"net.Throttle": ["../src/Throttle"],
 			"net.Serializer": ["../src/Serializer"]
 		}
-	}
+	},
+	"exclude": [
+		"docs/**/*"
+	]
 }

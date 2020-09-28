@@ -208,18 +208,6 @@ namespace Net {
 		return NetClientEvent.WaitFor(name);
 	}
 
-	/** @rbxts server */
-	export function GetServerFunctionAsync(name: string): Promise<NetServerFunction> {
-		return new Promise((resolve, reject) => {
-			if (functionExists(name)) {
-				const newFunc = new NetServerFunction(name);
-				resolve(newFunc);
-			} else {
-				reject("Could not find Server Function: " + name + " (did you create it?)");
-			}
-		});
-	}
-
 	if (IS_SERVER) {
 		let lastTick = 0;
 		ServerTickFunctions.push(() => {
@@ -231,28 +219,13 @@ namespace Net {
 	}
 
 	/**
-	 * Creates a type guard array to be used in Net
-	 * @param value The types
+	 * Rate Limiting Middleware
 	 */
-	export function Types<T0 extends TypeGuard<any>>(type0: T0): [T0];
-	export function Types<T0 extends TypeGuard<any>, T1 extends TypeGuard<any>>(type0: T0, type1: T1): [T0, T1];
-	export function Types<T0 extends TypeGuard<any>, T1 extends TypeGuard<any>, T2 extends TypeGuard<any>>(
-		type0: T0,
-		type1: T1,
-		type2: T2,
-	): [T0, T1, T2];
-	export function Types<
-		T0 extends TypeGuard<any>,
-		T1 extends TypeGuard<any>,
-		T2 extends TypeGuard<any>,
-		T3 extends TypeGuard<any>
-	>(type0: T0, type1: T1, type2: T2, type3: T3): [T0, T1, T2, T3];
-
-	export function Types<T extends Array<TypeGuard<any>>>(...value: T): TypeGuards<T> {
-		return (value as Array<TypeGuard<any>>) as TypeGuards<T>;
-	}
-
 	export const RateLimited = createRateLimiter;
+
+	/**
+	 * Static type guard middleware
+	 */
 	export const Typed = createTypeChecker;
 }
 

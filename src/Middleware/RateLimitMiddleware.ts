@@ -1,13 +1,11 @@
 import { errorft, NetManagedEvent, RequestCounter } from "../internal";
-import { ArgumentMiddlewareFunction } from "./Middleware";
+import { Middleware } from "./Middleware";
 import throttler from "../Throttle";
 import { GetConfiguration } from "../configuration";
 
 const throttles = new Map<NetManagedEvent, RequestCounter>();
 
-interface RateLimitMiddleware<N extends number> {
-	(input: Array<unknown>, player: Player, event: NetManagedEvent): Array<unknown>;
-}
+type RateLimitMiddleware = Middleware<any, Array<unknown>>;
 
 /**
  * Creates a throttle middleware for this event
@@ -17,26 +15,27 @@ interface RateLimitMiddleware<N extends number> {
  * _NOTE: Must be used before **other** middlewares as it's not a type altering middleware_
  * @param maxRequestsPerMinute The maximum requests per minute
  */
-function createRateLimiter<N extends number>(maxRequestsPerMinute: N): RateLimitMiddleware<N> {
-	return (input, player, event) => {
-		let throttle = throttles.get(event);
+function createRateLimiter(maxRequestsPerMinute: number): RateLimitMiddleware {
+	return (next, event) => {
 		const instance = event.GetInstance();
-		if (!throttle) {
+		let throttle = throttles.get(event)!;
+		if (throttle === undefined) {
 			throttle = throttler.Get(instance.GetFullName());
 		}
 
-		const count = throttle.Get(player);
-		if (count >= maxRequestsPerMinute) {
-			errorft(GetConfiguration("ServerThrottleMessage"), {
-				player: player.UserId,
-				remote: instance.Name,
-				limit: maxRequestsPerMinute,
-			});
-		} else {
-			throttle.Increment(player);
-		}
-
-		return input;
+		return (player, ...args) => {
+			const count = throttle.Get(player);
+			if (count >= maxRequestsPerMinute) {
+				errorft(GetConfiguration("ServerThrottleMessage"), {
+					player: player.UserId,
+					remote: instance.Name,
+					limit: maxRequestsPerMinute,
+				});
+			} else {
+				throttle.Increment(player);
+				next(player, ...args);
+			}
+		};
 	};
 }
 export default createRateLimiter;
